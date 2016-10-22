@@ -21,6 +21,7 @@ https://kafeiinteractif.github.io/offline-mode/#/
  - Bored while disconnected on the subway/métro
  - Networks can be slow, load time is slow
  - Adventure awaits (mountain climbing, islands, etc.)
+ - Internet goes down due to IoT devices gone mad (new!)
 
 
 
@@ -28,12 +29,11 @@ https://kafeiinteractif.github.io/offline-mode/#/
 ## What workarounds exist?
 
  - Native apps have been the answer
- - Only selling to "connected" clients
+ - Only selling to "online" clients
  - Reducing request time
    - Caching on the server
    - Aggregate, minify, use a CDN!
-   - SPDY anyone?
-   - BigPipe
+   - BigPipe?
 
 
 
@@ -72,7 +72,7 @@ https://kafeiinteractif.github.io/offline-mode/#/
 ## Our first (non-Drupal) appcache site!
 
  - index.html
- - myapp.appcache (webserver must server as text/cache-manifest)
+ - myapp.appcache (must be served as text/cache-manifest)
  - JavaScript (used ES6 in our demo, so use recent browser)
  - https://github.com/kafeiinteractif/bulletpad
 
@@ -193,8 +193,12 @@ https://kafeiinteractif.github.io/bulletpad/
 <!-- .slide: data-background-color="#718522" -->
 ## appcache basics: further reading
 
-  "Application Cache is a Douchebag"
-  http://alistapart.com/article/application-cache-is-a-douchebag
+"A Beginner's Guide to Using the Application Cache"
+https://www.html5rocks.com/en/tutorials/appcache/beginner/
+
+
+"Application Cache is a Douchebag"
+http://alistapart.com/article/application-cache-is-a-douchebag
 
 
 
@@ -242,29 +246,40 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 <!-- .slide: data-background-color="#8B7324" -->
 ## offline_app content type configuration
 
- - Edit the content type and add either (or both) the "offline page" and "offline teaser" view modes.
+ - Use content type manage display "custom display settings" to add either (or both) the "offline page" and "offline teaser" view modes.
 
  - After enabling view mode go to /admin/config/services/offline-app/content
 
- - Input a node path: articles-one/node:1
+ - Input a node path: beauty/node:1
 
- - Now /offline/articles-one should return node/1 (without images).
+ - Now /offline/beauty should return /node/1 (rebuild cache?)
 
 
 
 <!-- .slide: data-background-color="#8B7324" -->
 ## offline_app views configuration
 
- - View mode for the view
+ - Add an "offline" display to the view
 
-    articles/view:name:offline_1
+ - Show: "content" with "offline page" view mode
 
- - Format has to be show offline (content || teaser)
+ - Reference it in our config:
 
- - Make sure the listed content has the offline view mode configured!
+    articles/view:super_awesome:offline_1
 
- - Now /offline/articles will show the view called "name" using the offline_1 variant
+ - Now /offline/articles will show the view called "super_awesome" using the offline_1 variant
 
+
+
+<!-- .slide: data-background-color="#8B7324" -->
+## offline_app config complete
+<img src='images/offline_app_config.png' alt='config page screenshot for offline_app'>
+
+
+
+<!-- .slide: data-background-color="#8B7324" -->
+## offline_app ... much wow!
+<img src='images/offline_app_in_action.png' alt='offline_app final result'>
 
 
 
@@ -375,6 +390,7 @@ Evil example code that breaks offline mode! \o/
 
 
 <!-- .slide: data-background-color="#8B4524" -->
+Oops, we destroyed cache on startup by using that code!
 <img src='images/serviceworker-activate-offline.png' alt='chrome offline screen (in french)' >
 
 
@@ -388,7 +404,7 @@ Interceping any http request, serving local if possible!
         caches.match(e.request).then(function(response) {
           return response || fetch(e.request);
         })
-      );
+      ); // iterate on your other caches
     });
 Many alternate variations of this: can do cache-only, network-only, network-fallback, or race network vs. cache! Also: cache-then-network, or offline.html message... examples in "Offline Cookbook" (see last slide).
 
@@ -399,6 +415,9 @@ Many alternate variations of this: can do cache-only, network-only, network-fall
 
  - Needs https or "localhost" domain to test/run
  - Update the cache key(s) with each revision
+ - console_log is your friend
+ - chrome://inspect/#service-workers
+ - chrome://serviceworker-internals
 
 
 
@@ -406,7 +425,7 @@ Many alternate variations of this: can do cache-only, network-only, network-fall
 ## Service Worker: potential problems
 
  - Every change *can* make the entire site re-download (design around this)
- - Cache can expire... if you delete cache on activate
+ - Cache can expire... if you delete cache on activate ;)
  - Devices have storage limits, query them! Find out if full.
  - No reload button for Chrome on Android (pull down to reload)
 
@@ -474,3 +493,13 @@ https://jakearchibald.com/2014/offline-cookbook/
 
 "Web App Install Banners"
 https://developers.google.com/web/fundamentals/engage-and-retain/app-install-banners/
+
+
+
+<!-- .slide: data-background-color="#8B4524" -->
+## Thanks!
+# ✈
+
+https://github.com/kafeiinteractif/offline-mode
+
+https://twitter.com/ryan_weal
