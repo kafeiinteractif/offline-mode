@@ -465,12 +465,13 @@ https://www.drupal.org/project/serviceworker
 <!-- .slide: data-background-color="#8B4524" -->
 ## Service Worker PWA Drupal Module
 
+ - has support for "installing" the site, icon config
+ - choose standalone app, fullscreen mode, minimal UI
+ - pick what URLs to cache on install
  - intended to help speed up CSS and JS
- - has support for "installing" the site
 
- - tries to be aware of images and other assets but does not currently cache them
- - surprisingly has some support for background sync
- - cache key is hardcoded, hard to update
+ - tries to be aware of images, etc. but does not cache them
+ - cache key is hard to update
 
 
 
