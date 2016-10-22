@@ -8,7 +8,7 @@ Kafei Interactive Inc.
 Badcamp 2016 ~ San Francisco, California
 
 Formatted as slides here:
-https://kafeiinteractif.github.io/badcamp2016/#/
+https://kafeiinteractif.github.io/offline-mode/#/
 
 
 
