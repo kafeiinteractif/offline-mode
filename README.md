@@ -5,7 +5,9 @@ Ryan Weal
 
 Kafei Interactive Inc.
 
-Badcamp 2016 ~ San Francisco, California
+New Jersy DrupalCamp 2017 (version 2)
+
+Badcamp 2016 ~ San Francisco, California (version 1)
 
 Formatted as slides here:
 https://kafeiinteractif.github.io/offline-mode/#/
@@ -26,14 +28,14 @@ https://kafeiinteractif.github.io/offline-mode/#/
 
 
 <!-- .slide: data-background-color="#262361" -->
-## What workarounds exist?
+## What could offline replace?
 
- - Native apps have been the answer
- - Only selling to "online" clients
- - Reducing request time
-   - Caching on the server
-   - Aggregate, minify, use a CDN!
-   - BigPipe?
+ - Online-only activities
+ - Native apps
+ - Quests to reduce dns & http request time:
+   - Server-side caching, reverse proxies, CDNs
+   - Aggregation of resources, minification
+   - BigPipe - pushing down the "shell" first
 
 
 
@@ -41,21 +43,26 @@ https://kafeiinteractif.github.io/offline-mode/#/
 ## Planning for Offline 
 
  - What content do you *really* need when offline?
+ - Is there functionality you need that you can sync?
  - Where do you direct your users when content is not available?
  - How long should your initial page load take?
+   - People generally abandon requests of 10s or more.
+ - Keep it light! 5MB or less is ideal.
+   - Storage limits set by browser. See "The Offline Cookbook" for more details.
 
 
 
 <!-- .slide: data-background-color="#262361" -->
-## Considerations
+## We have done things like this before!
 
- - Similar to Content Security Policy (CSP) needs
- - Same origin - no CDN, embeds, AJAX
+ - Same origin - no CDN, embeds, AJAX*
  - Load the initial shell, the content, more?
+ - Similar to Content Security Policy (CSP) needs
+ - Also similar to expire headers
 
 
 
-<!-- .slide: data-background-color="#718522" -->
+<!-- .slide: data-background-color="#39510f" -->
 ## appcache
 
  - Adds a metadata field to your HTML
@@ -64,11 +71,12 @@ https://kafeiinteractif.github.io/offline-mode/#/
  - Content is served locally first
  - Just works™
 
- - depreciated (this is why we can't have nice things)
+ - Depreciated (this is why we can't have nice things)
+ - Can be overly simplistic, limited use cases
 
 
 
-<!-- .slide: data-background-color="#718522" -->
+<!-- .slide: data-background-color="#39510f" -->
 ## Our first (non-Drupal) appcache site!
 
  - index.html
@@ -78,7 +86,7 @@ https://kafeiinteractif.github.io/offline-mode/#/
 
 
 
-<!-- .slide: data-background-color="#718522" -->
+<!-- .slide: data-background-color="#39510f" -->
 ## appcache index.html
 
     <!doctype html>
@@ -109,7 +117,7 @@ This uses vue.js, btw... we love it.
 
 
 
-<!-- .slide: data-background-color="#718522" -->
+<!-- .slide: data-background-color="#39510f" -->
 ## appcache bulletpad.appcache
     CACHE MANIFEST
     # v11
@@ -129,52 +137,14 @@ No fallback in this case
 
 
 
-<!-- .slide: data-background-color="#718522" -->
-## appcache "app"... main.js
-
-    window.onload = () => {
-      new Vue({
-        el: '#app',
-        data() {
-          if (localStorage.getItem("lystical") === null) {
-            return { todos: [
-              {text: 'to delete press the × beside the entry and then enter to confirm'},
-              {text: 'to create a note type in the field at the top and press enter'}
-            ]};
-          }
-          else {
-            return { todos: JSON.parse(localStorage.getItem("lystical")) };
-          }
-        },
-        methods: {
-          addTodo() {
-            const input = this.newTodo.trim();
-            if (input) {
-              this.todos.push({ text: input });
-              this.newTodo = '';
-              localStorage.setItem('lystical', JSON.stringify(this.todos));
-            }
-          },
-          removeTodo(index) {
-            const item = this.todos.length - 1 - index;
-            if (confirm(`Delete this?\n${this.todos[item].text}`) == true) {
-              this.todos.splice(item, 1);
-              localStorage.setItem('lystical', JSON.stringify(this.todos));
-            }
-          },
-        },
-        filters: {
-          reverse(value) {
-            return value.slice().reverse();
-          }
-        }
-      });
-    };
-Mmm, tasty ES6 syntax, lightly linted.
+<!-- .slide: data-background-color="#39510f" -->
+## appcache demo app
+https://kafeiinteractif.github.io/bulletpad/
+<img src='images/appcache.png' alt='screenshot of example app'>
 
 
 
-<!-- .slide: data-background-color="#718522" -->
+<!-- .slide: data-background-color="#39510f" -->
 ## appcache debugging
 
  - Keep the console log open
@@ -183,14 +153,7 @@ Mmm, tasty ES6 syntax, lightly linted.
 
 
 
-<!-- .slide: data-background-color="#718522" -->
-## appcache demo app
-https://kafeiinteractif.github.io/bulletpad/
-<img src='images/appcache.png' alt='screenshot of example app'>
-
-
-
-<!-- .slide: data-background-color="#718522" -->
+<!-- .slide: data-background-color="#39510f" -->
 ## appcache basics: further reading
 
 "A Beginner's Guide to Using the Application Cache"
@@ -202,7 +165,7 @@ http://alistapart.com/article/application-cache-is-a-douchebag
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## appcache drupal module
 
 "Offline Application"
@@ -213,7 +176,7 @@ https://www.drupal.org/project/offline_app
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app assumptions
 
  - All the content is going to fall under /offline/
@@ -227,7 +190,7 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app setup
 
  - Enable permissions for anonymous user:
@@ -243,7 +206,7 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app content type configuration
 
  - Use content type manage display "custom display settings" to add either (or both) the "offline page" and "offline teaser" view modes.
@@ -256,7 +219,7 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app views configuration
 
  - Add an "offline" display to the view
@@ -271,19 +234,19 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app config complete
 <img src='images/offline_app_config.png' alt='config page screenshot for offline_app'>
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app ... much wow!
 <img src='images/offline_app_in_action.png' alt='offline_app final result'>
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## offline_app potential problems!
 
  - New nodes not added to list automagically
@@ -294,7 +257,7 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 
 
 
-<!-- .slide: data-background-color="#8B7324" -->
+<!-- .slide: data-background-color="#685103" -->
 ## appcache and offline_app: further reading
 
 "Let's make Drupal 8 available offline using appcache"
