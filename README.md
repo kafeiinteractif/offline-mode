@@ -43,12 +43,22 @@ https://kafeiinteractif.github.io/offline-mode/#/
 ## Planning for Offline 
 
  - What content do you *really* need when offline?
- - Is there functionality you need that you can sync?
- - Where do you direct your users when content is not available?
+ - Can you sync "online" functionality?
+   - Perhaps using waterwheel.js for Drupal 8
+     https://github.com/acquia/waterwheel.js
+ - Do you want fallback content if resource not available?
+
+
+
+<!-- .slide: data-background-color="#262361" -->
+## More planning considerations...
+
  - How long should your initial page load take?
    - People generally abandon requests of 10s or more.
  - Keep it light! 5MB or less is ideal.
    - Storage limits set by browser. See "The Offline Cookbook" for more details.
+   - You may use IndexedDB to get around this*
+ - Do you need a companion desktop application?
 
 
 
@@ -59,6 +69,7 @@ https://kafeiinteractif.github.io/offline-mode/#/
  - Load the initial shell, the content, more?
  - Similar to Content Security Policy (CSP) needs
  - Also similar to expire headers
+ - XMLsitemap? Yep sorta like that too.
 
 
 
@@ -265,11 +276,11 @@ https://www.agiledrop.com/blog/lets-make-drupal-8-available-offline-using-appcac
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker
 
- - Related to concept of "Progressive Web Apps" (PWA)
- - Can be added to user's Android homescreen
+ - Also known as: "Progressive Web Apps!" (PWA)
+ - Can be added to user's Android homescreen*
  - Loads the shell first, content appears later
  - Site assets for the shell cached locally for speed
  - Sounds a little like Big Pipe? Yep! Somewhat.
@@ -278,7 +289,7 @@ https://www.agiledrop.com/blog/lets-make-drupal-8-available-offline-using-appcac
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker: Characteristics
 
  - Manifest file is now in JSON format
@@ -290,18 +301,36 @@ https://www.agiledrop.com/blog/lets-make-drupal-8-available-offline-using-appcac
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
+## Service Worker demo
+https://kafeiinteractif.github.io/bulletpad_pwa/
+<img src='images/bulletpad_pwa.png' alt='screenshot of bulletpad_pwa'>
+
+
+
+<!-- .slide: data-background-color="#93270a" -->
+### Service Worker pwa appears "standalone"
+<img src='images/bulletpad_pwa_switcher.png' alt='screenshot of bulletpad varients in application switcher' width='40%' height='40%'>
+
+
+
+
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker: Is it ready?
 
  - Check the status here: https://jakearchibald.github.io/isserviceworkerready/
 
  - Safari and Edge... this is why we can't have nice things!
+   - Edge has support for *some* things and it is improving.
 
- - Edge has support for *some* things but not yet usable for what we want. At least they are working on it though.
+ - YES! You can use both, if Service Worker sees an appcache it
+   will disable it.
+   - JakeCache creates Service Workers using Appcache syntax (and limitations!)
+   - https://github.com/kenchris/jakecache
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 Define the caches and context
 
     var cacheName = 'bulletpad-x6'; // app shell
@@ -316,7 +345,7 @@ Define the caches and context
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 Setting up our app by caching the shell
 
     self.addEventListener('install', function(e) {
@@ -332,8 +361,8 @@ Setting up our app by caching the shell
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
-Evil example code that breaks offline mode! \o/
+<!-- .slide: data-background-color="#93270a" -->
+If installed correctly this will check for a new version on first launch after reboot.
 
     self.addEventListener('activate', function(e) {
       console.log('[ServiceWorker] Activate');
@@ -352,13 +381,7 @@ Evil example code that breaks offline mode! \o/
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
-Oops, we destroyed cache on startup by using that code!
-<img src='images/serviceworker-activate-offline.png' alt='chrome offline screen (in french)' >
-
-
-
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 Interceping any http request, serving local if possible!
 
     self.addEventListener('fetch', function(e) {
@@ -373,7 +396,7 @@ Many alternate variations of this: can do cache-only, network-only, network-fall
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker debugging
 
  - Needs https or "localhost" domain to test/run
@@ -381,51 +404,40 @@ Many alternate variations of this: can do cache-only, network-only, network-fall
  - console_log is your friend
  - chrome://inspect/#service-workers
  - chrome://serviceworker-internals
+ - Test with Google Lighthouse (new!)
+   - https://developers.google.com/web/tools/lighthouse/
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker: potential problems
 
- - Every change *can* make the entire site re-download (design around this)
- - Cache can expire... if you delete cache on activate ;)
+ - Every change *can* make the entire site re-download (but you can design around this)
  - Devices have storage limits, query them! Find out if full.
  - No reload button for Chrome on Android (pull down to reload)
+ - Unless you use Lighthouse to test you may have bugs interfering with offline capability!
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
-## Service Worker demo
-https://kafeiinteractif.github.io/bulletpad_pwa/
-<img src='images/bulletpad_pwa.png' alt='screenshot of bulletpad_pwa'>
-
-
-
-<!-- .slide: data-background-color="#8B4524" -->
-### Service Worker pwa appears "standalone"
-<img src='images/bulletpad_pwa_switcher.png' alt='screenshot of bulletpad varients in application switcher' width='40%' height='40%'>
-
-
-
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker Drupal Modules
 
-"Progressive Web App" by nod
+"Progressive Web App" by nod_
 
 for Drupal 7 and Drupal 8
 
 https://www.drupal.org/project/pwa
 
-"Service Worker" by nod
+"Service Worker" by nod_
 
-No official release yet.
+No official release yet. Looks to be a demo in favor of above.
 
 https://www.drupal.org/project/serviceworker
 
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker PWA Drupal Module
 
  - has support for "installing" the site, icon config
@@ -438,7 +450,34 @@ https://www.drupal.org/project/serviceworker
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
+## Service Worker new features
+
+Google announced in February 2017 that Service Worker apps will
+now have all of the other capabilities of a native app, including:
+
+ - generated APK file
+ - install/uninstall functionality
+ - visible in apps drawer, not just homescreen
+
+ ... but you cannot submit that APK to the Play store.
+
+
+
+<!-- .slide: data-background-color="#93270a" -->
+## Service Worker, in Drupal Core?
+
+This idea has been floated as a demonstration of basic
+functionality that would be "out of the box" functional.
+
+Target audience would be camps primarily. More advanced use
+cases would make their own module.
+
+https://www.drupal.org/node/2830668
+
+
+
+<!-- .slide: data-background-color="#93270a" -->
 ## Service Worker: further reading
 
 "Your First Progressive Web App"
@@ -449,7 +488,7 @@ https://developers.google.com/web/fundamentals/getting-started/codelabs/offline/
 
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+<!-- .slide: data-background-color="#93270a" -->
 ## More Good Stuff
 
 "The offline cookbook"
@@ -458,9 +497,15 @@ https://jakearchibald.com/2014/offline-cookbook/
 "Web App Install Banners"
 https://developers.google.com/web/fundamentals/engage-and-retain/app-install-banners/
 
+"Electron"
+http://electron.atom.io/
+
+You can also render your PWAs as desktop
+apps. Electron is a wrapper for Chrome's rendering engine.
 
 
-<!-- .slide: data-background-color="#8B4524" -->
+
+<!-- .slide: data-background-color="#93270a" -->
 ## Thanks!
 # ✈
 
