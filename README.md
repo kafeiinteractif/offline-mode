@@ -5,9 +5,7 @@ Ryan Weal
 
 Kafei Interactive Inc.
 
-New Jersy DrupalCamp 2017 (version 2)
-
-Badcamp 2016 ~ San Francisco, California (version 1)
+DrupalCamp Northern Lights, Reykjavík, Iceland
 
 Formatted as slides here:
 https://kafeiinteractif.github.io/offline-mode/#/
@@ -20,70 +18,60 @@ https://kafeiinteractif.github.io/offline-mode/#/
 
  - Wifi not always on board aircraft
  - Travelling internationally without data
- - Bored while disconnected on the subway/métro
+ - Bored while on the bus
  - Networks can be slow, load time is slow
- - Adventure awaits (mountain climbing, islands, etc.)
- - Internet goes down due to IoT devices gone mad (new!)
-
-
-
-<!-- .slide: data-background-color="#262361" -->
-## What could offline replace?
-
- - Online-only activities
- - Native apps
- - Quests to reduce dns & http request time:
-   - Server-side caching, reverse proxies, CDNs
-   - Aggregation of resources, minification
-   - BigPipe - pushing down the "shell" first
+ - Adventure awaits (when you are out in the mountains!)
+ - Internet goes down due to IoT devices, undersea cables, etc.
 
 
 
 <!-- .slide: data-background-color="#262361" -->
 ## Planning for Offline 
 
- - What content do you *really* need when offline?
- - Can you sync "online" functionality?
+ - Decide what content you need offline
+ - Do you want fallback content if not online?
+ - What will we sync with an online Database?
+   - Maybe you need some functionality that you later push to Drupal
    - Perhaps using waterwheel.js for Drupal 8
      https://github.com/acquia/waterwheel.js
- - Do you want fallback content if resource not available?
+   - Using API calls, etc. "Headless.."
 
 
 
 <!-- .slide: data-background-color="#262361" -->
-## More planning considerations...
+## Architecture considerations...
 
  - How long should your initial page load take?
    - People generally abandon requests of 10s or more.
  - Keep it light! 5MB or less is ideal.
    - Storage limits set by browser. See "The Offline Cookbook" for more details.
    - You may use IndexedDB to get around this*
- - Do you need a companion desktop application?
+ - Will you need a companion desktop application? (ie, Electron?)
 
 
 
 <!-- .slide: data-background-color="#262361" -->
-## We have done things like this before!
+## Does this sound familiar?
 
- - Same origin - no CDN, embeds, AJAX*
- - Load the initial shell, the content, more?
- - Similar to Content Security Policy (CSP) needs
- - Also similar to expire headers
- - XMLsitemap? Yep sorta like that too.
+ - Content Security Policy (CSP)
+   - Forces same origin - no CDN, embeds, AJAX*
+ - Bigpipe loads the initial shell of the site
+ - Cache expiry headers
+ - XMLsitemap lists all resources on a site
 
 
 
 <!-- .slide: data-background-color="#39510f" -->
-## appcache
+## appcache (first strategy)
 
  - Adds a metadata field to your HTML
- - Specifies a manifest file that lists resources
+ - Specifies a manifest file that lists the resources
  - Downloads ALL the resources on the first page hit
- - Content is served locally first
+ - Content is served locally first, until new manifest
  - Just works™
 
  - Depreciated (this is why we can't have nice things)
- - Can be overly simplistic, limited use cases
+ - Currently the ONLY way to do offline on Apple devices
 
 
 
@@ -142,9 +130,9 @@ This uses vue.js, btw... we love it.
     
     NETWORK:
     *
-No fallback in this case
+No offline fallback in this case, but it is possible.
 
-(there is nothing that is not in the appcache here!)
+(100% of this "site" is in the manifest)
 
 
 
@@ -260,11 +248,13 @@ Very tempting to try putting paths in first page of config... don't! Use the Con
 <!-- .slide: data-background-color="#685103" -->
 ## offline_app potential problems!
 
- - New nodes not added to list automagically
+ - Nothing added to the manifest automatically (nodes, etc)
  - Add stylesheets to your Assets list, but paths can change...
- - When to reload (or prompt user to reload)
+ - When (and how) to reload with new content
  - No option for separate caches for shell/content
  - Visit the homepage, check that <html> tag has manifest reference
+
+ - Roll your own implementation?
 
 
 
@@ -281,11 +271,9 @@ https://www.agiledrop.com/blog/lets-make-drupal-8-available-offline-using-appcac
 
  - Also known as: "Progressive Web Apps!" (PWA)
  - Can be added to user's Android homescreen*
- - Loads the shell first, content appears later
- - Site assets for the shell cached locally for speed
- - Sounds a little like Big Pipe? Yep! Somewhat.
+ - Encouraged to load the shell first, fetch content later...
+ - Multiple caches! As many as you want.
  - Our demo code: https://github.com/kafeiinteractif/bulletpad_pwa
-
 
 
 
@@ -293,25 +281,11 @@ https://www.agiledrop.com/blog/lets-make-drupal-8-available-offline-using-appcac
 ## Service Worker: Characteristics
 
  - Manifest file is now in JSON format
- - Requires JavaScript to register Service Worker
- - Recommended to do things like use "loading" icon
+ - Requires JavaScript to register the "Service Worker"
+ - Recommended to do things like use a loading icon
  - Code can target different stages: install / activate / fetch
  - You are free to create many types of caches for your data
  - Intercepts requets so you can choose offline or online content
-
-
-
-<!-- .slide: data-background-color="#93270a" -->
-## Service Worker demo
-https://kafeiinteractif.github.io/bulletpad_pwa/
-<img src='images/bulletpad_pwa.png' alt='screenshot of bulletpad_pwa'>
-
-
-
-<!-- .slide: data-background-color="#93270a" -->
-### Service Worker pwa appears "standalone"
-<img src='images/bulletpad_pwa_switcher.png' alt='screenshot of bulletpad varients in application switcher' width='40%' height='40%'>
-
 
 
 
@@ -327,6 +301,19 @@ https://kafeiinteractif.github.io/bulletpad_pwa/
    will disable it.
    - JakeCache creates Service Workers using Appcache syntax (and limitations!)
    - https://github.com/kenchris/jakecache
+
+
+
+<!-- .slide: data-background-color="#93270a" -->
+## Service Worker demo
+https://kafeiinteractif.github.io/bulletpad_pwa/
+<img src='images/bulletpad_pwa.png' alt='screenshot of bulletpad_pwa'>
+
+
+
+<!-- .slide: data-background-color="#93270a" -->
+### Service Worker pwa appears "standalone"
+<img src='images/bulletpad_pwa_switcher.png' alt='screenshot of bulletpad varients in application switcher' width='40%' height='40%'>
 
 
 
