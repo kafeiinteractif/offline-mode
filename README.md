@@ -267,7 +267,7 @@ https://www.agiledrop.com/blog/lets-make-drupal-8-available-offline-using-appcac
 
 
 <!-- .slide: data-background-color="#93270a" -->
-## Service Worker
+## Service Worker (second offline strategy)
 
  - Also known as: "Progressive Web Apps!" (PWA)
  - Can be added to user's Android homescreen*
