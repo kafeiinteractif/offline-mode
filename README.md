@@ -147,8 +147,9 @@ https://kafeiinteractif.github.io/bulletpad/
 ## appcache debugging
 
  - Keep the console log open
- - Reload twice?
  - Update the serial "number" in manifest with each change
+ - Chrome dev tools Network tab has "disbable cache" and "offline" modes
+ - New version loads after serving old verison to user
 
 
 
